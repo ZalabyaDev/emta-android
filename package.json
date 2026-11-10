@@ -1,0 +1,14 @@
+{
+  "name": "emta-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Android wrapper for the Emta web app",
+  "dependencies": {
+    "@capacitor/android": "^7.4.0",
+    "@capacitor/core": "^7.4.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.4.0"
+  }
+}

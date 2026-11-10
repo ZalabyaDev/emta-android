@@ -1,0 +1,9 @@
+{
+  "appId": "com.zalabyadev.emta",
+  "appName": "Emta",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#FAF8F3",
+    "adjustMarginsForEdgeToEdge": "auto"
+  }
+}
