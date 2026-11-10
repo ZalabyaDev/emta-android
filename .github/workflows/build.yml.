@@ -1,0 +1,79 @@
+# Builds the Emta Android app (APK) in the cloud. No Android Studio needed.
+# Run it from the Actions tab -> "Build Emta APK" -> "Run workflow".
+name: Build Emta APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Get the latest Emta web app from the Waqt repo
+        run: |
+          git clone --depth 1 https://github.com/ZalabyaDev/Waqt.git www
+          rm -rf www/.git
+          test -f www/index.html
+
+      - name: Install Capacitor
+        run: npm install
+
+      - name: Create the Android project
+        run: npx cap add android
+
+      - name: Allow location (for prayer times)
+        run: |
+          M=android/app/src/main/AndroidManifest.xml
+          grep -q ACCESS_FINE_LOCATION "$M" || sed -i 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n</manifest>#' "$M"
+          cat "$M"
+
+      - name: App icon
+        run: |
+          mkdir -p assets
+          for f in icon-only.png icon-foreground.png icon-background.png; do [ -f "$f" ] && mv "$f" assets/; done
+          npx @capacitor/assets generate --android --iconBackgroundColor '#5C7A5C' --splashBackgroundColor '#FAF8F3'
+
+      - name: Copy web app into Android
+        run: npx cap sync android
+
+      - name: Use the same signing key every build (so updates install over the old app)
+        run: |
+          mkdir -p ~/.android
+          cp debug.keystore ~/.android/debug.keystore
+          cat >> android/app/build.gradle <<'GRADLE'
+
+          android {
+              signingConfigs {
+                  debug {
+                      storeFile file("../../debug.keystore")
+                      storePassword "android"
+                      keyAlias "androiddebugkey"
+                      keyPassword "android"
+                  }
+              }
+          }
+          GRADLE
+
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: emta-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
