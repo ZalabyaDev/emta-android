@@ -6,7 +6,8 @@
   "dependencies": {
     "@capacitor/android": "^7.4.0",
     "@capacitor/app": "^7.1.2",
-    "@capacitor/core": "^7.4.0"
+    "@capacitor/core": "^7.4.0",
+    "@capacitor/local-notifications": "^7.0.7"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",

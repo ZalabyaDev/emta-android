@@ -5,5 +5,11 @@
   "android": {
     "backgroundColor": "#FAF8F3",
     "adjustMarginsForEdgeToEdge": "auto"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_emta",
+      "iconColor": "#5C7A5C"
+    }
   }
 }
